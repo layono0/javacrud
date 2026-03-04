@@ -1,11 +1,13 @@
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.regex.Pattern;
 
 public class Main {
-    private static List<Alunos> listaAlunos = new ArrayList<>();
+    private static ArrayList<Alunos> listaAlunos = new ArrayList<>();
         public static void main(String[] args){
             menuAlunos();
+
         }
 
         public static void menuAlunos(){
@@ -26,7 +28,7 @@ public class Main {
                     criarAluno();
                     break;
                 case "3":
-                    System.out.println("opcao 3");
+                    excluirObj();
                     break;
                 case "4":
                     System.out.println("opcao 4");
@@ -38,7 +40,11 @@ public class Main {
         }
         private static void criarAluno(){
             int idadeNum = 0;
-            String nome = Ler.dados("Nome do aluno: ");
+            String nome = Ler.dados("Nome do aluno: ").replaceAll("\\\\s", "");;
+            while(!isLetra(nome)){
+                System.out.print("o nome deve ser digitado com letras e sem espacos");
+                nome = Ler.dados("Nome do aluno: ");
+            }
             String idade = Ler.dados("Idade do aluno");
             while(!isNumero(idade)){
                 System.out.print("a idade deve ser um número: ");
@@ -47,19 +53,20 @@ public class Main {
 
             }
             idadeNum = Integer.parseInt(idade);
-            String matricula = Ler.dados("Matricula do aluno: ");
+            String matricula = Ler.dados("Matricula do aluno: ").replaceAll("\\\\s", "");
 
             Alunos alunoNovo = new Alunos(nome, idadeNum, matricula);
             listaAlunos.add(alunoNovo);
             System.out.println(listaAlunos);
+            menuAlunos();
 
         }
 
         private static boolean isNumero(String numero){
-
-            if(numero == null && numero.isBlank()){
-                return  false;
-            }
+//
+//            if(numero == null && numero.isBlank()){
+//                return  false;
+//            }
 
             try {
                 Integer.parseInt(numero);
@@ -69,7 +76,24 @@ public class Main {
                 return  false;
             }
 
+
         }
+        private static boolean isLetra(String str){
+            if(!Pattern.matches("[a-zA-Z]+", str)){
+                return false;
+            }
+            else{
+                return true;
+            }
+
+
+        }
+        private static void excluirObj(){
+            for(Object obj : listaAlunos){
+                System.out.println(obj);
+            }
+        }
+
 
 
 
