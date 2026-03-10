@@ -32,7 +32,7 @@ public class Main {
                 excluirObj();
                 break;
             case "4":
-                System.out.println("opcao 4");
+                atualizarAlunos();
                 break;
             default:
                 System.out.println("Opção Inválida, tente novamente!");
@@ -43,7 +43,8 @@ public class Main {
     private static void criarAluno() {
         int idadeNum = 0;
         String nome = Ler.dados("Nome do aluno: ").replaceAll("\\\\s", "");
-        ;
+
+
         while (!isLetra(nome)) {
             System.out.print("o nome deve ser digitado com letras e sem espacos");
             nome = Ler.dados("Nome do aluno: ");
@@ -135,8 +136,55 @@ public class Main {
 
     }
 
-    private static void atualizarObj(){
-        
+    private static void atualizarAlunos(){
+
+
+        int contagem = 0;
+
+        System.out.println("Alunos cadastrados no momento");
+        for (Alunos aluno : listaAlunos) {
+            contagem++;
+            System.out.println(contagem + " - " + aluno.getNome());
+
+        }
+
+        String opcaoStr = Ler.dados("Digite o numero referente ao aluno que deseja Editar: ");
+        while (!isNumero(opcaoStr)) {
+            System.out.print("A opcao desejada DEVE ser um numero." + '\n');
+            opcaoStr = Ler.dados("Numero referente ao aluno: ");
+
+        }
+        int opcao = diminuiUm(Integer.parseInt(opcaoStr));
+
+        String menutxt = """
+                (Escolha o atributo para modificar)
+                1- Nome
+                2- Idade
+                3- Matricula
+                
+                """;
+        System.out.println(menutxt);
+        System.out.println(listaAlunos.get(opcao));
+
+        String opcaoUpdate = Ler.dados("Escolha qual Propriedade deseja editar: ");
+
+            switch (opcaoUpdate){
+                case "1":
+
+                    break;
+                case "2":
+
+                    break;
+                case "3":
+
+                    break;
+                default:
+                    System.out.println("Opcao invalida! escolha apenas entre os números da lista");
+
+            }
+
+
+
     }
 
 }
