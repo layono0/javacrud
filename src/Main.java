@@ -91,7 +91,8 @@ public class Main {
 
     }
     private static boolean opcaoisValida(String str){
-        if(str.equals("S") && str.equals("N")){
+
+        if(str.equalsIgnoreCase("S") || str.equalsIgnoreCase("N")){
             return true;
         }
         else{
@@ -99,7 +100,7 @@ public class Main {
         }
     }
     private static int diminuiUm(int indice){
-        return indice + 1;
+        return indice - 1;
     }
 
     private static void excluirObj() {
@@ -117,7 +118,7 @@ public class Main {
 
         }
         int opcao = diminuiUm(Integer.parseInt(opcaoStr));
-        String confirm = Ler.dados("Voce deseja MESMO excluir o aluno? confirme com S/N: ");
+        String confirm = Ler.dados("Voce deseja MESMO excluir o aluno? confirme com S/N: ").toUpperCase();
         while(!opcaoisValida(confirm)){
             System.out.println("Opcao invalida! a escolha deve ser S ou N");
             confirm = Ler.dados("Voce deseja MESMO excluir o aluno? confirme com S/N: ");
@@ -132,6 +133,10 @@ public class Main {
 
         System.out.println(listaAlunos);
 
+    }
+
+    private static void atualizarObj(){
+        
     }
 
 }
