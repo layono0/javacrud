@@ -99,6 +99,7 @@ public class Main {
         else{
             return false;
         }
+        //
     }
     private static int diminuiUm(int indice){
         return indice - 1;
@@ -170,13 +171,13 @@ public class Main {
 
             switch (opcaoUpdate){
                 case "1":
-
+                    atualizarNome(opcao);
                     break;
                 case "2":
-
+                    atualizarIdade(opcao);
                     break;
                 case "3":
-
+                    atualizarMatricula(opcao);
                     break;
                 default:
                     System.out.println("Opcao invalida! escolha apenas entre os números da lista");
@@ -185,6 +186,78 @@ public class Main {
 
 
 
+    }
+
+    private  static  void atualizarNome(int opcao){
+        String novoNome = Ler.dados("Escolha o novo nome do Aluno: ");
+
+        while(!isLetra(novoNome)){
+            System.out.println("Esse nome e invalido, use apenas letras e sem espacos.");
+            novoNome = Ler.dados("Escolha o novo nome do Aluno: ");
+        }
+
+        String confirm = Ler.dados("O novo nome sera: " + novoNome + " Deseja prosseguir com esse novo nome? S/N").toUpperCase();
+        while(!opcaoisValida(confirm)){
+            System.out.println("Opcao invalida! a escolha deve ser S ou N");
+            confirm = Ler.dados("O novo nome sera: \" + novoNome + \" Deseja prosseguir com esse novo nome? S/N ");
+        }
+        if(confirm.equals("S")){
+            listaAlunos.get(opcao).setNome(novoNome);
+        }
+        else{
+            System.out.println("Cancelado, voltando ao menu inicial...");
+            menuAlunos();
+        }
+        System.out.println(listaAlunos);
+
+
+    }
+
+
+    private  static  void atualizarIdade(int opcao){
+        String novaIdadeStr = Ler.dados("Escolha a nova idade do Aluno: ");
+        while (!isNumero(novaIdadeStr)) {
+            System.out.print("A opcao desejada DEVE ser um numero." + '\n');
+            novaIdadeStr = Ler.dados("Numero referente ao aluno: ");
+
+        }
+        int idade = Integer.parseInt(novaIdadeStr);
+        String confirm = Ler.dados("A nova idade sera: " + idade + " Deseja prosseguir com essa nova idade? S/N").toUpperCase();
+        while(!opcaoisValida(confirm)){
+            System.out.println("Opcao invalida! a escolha deve ser S ou N");
+            confirm = Ler.dados("A nova idade sera: \" + idade + \" Deseja prosseguir com essa nova idade? S/N ");
+        }
+        if(confirm.equals("S")){
+            listaAlunos.get(opcao).setIdade(idade);
+        }
+        else{
+            System.out.println("Cancelado, voltando ao menu inicial...");
+            menuAlunos();
+        }
+        System.out.println(listaAlunos);
+    }
+
+
+    private  static  void atualizarMatricula(int opcao){
+        String novaMatricula = Ler.dados("Escolha a nova matricula do Aluno: ");
+        while(!isLetra(novaMatricula)){
+            System.out.println("essa matricula e invalida, use apenas letras e sem espacos.");
+            novaMatricula = Ler.dados("Escolha a nova matricula do Aluno: ");
+        }
+
+        String confirm = Ler.dados("A nova matricula sera: " + novaMatricula + " Deseja prosseguir com essa nova matricula? S/N").toUpperCase();
+        while(!opcaoisValida(confirm)){
+            System.out.println("Opcao invalida! a escolha deve ser S ou N");
+            confirm = Ler.dados("A nova matricula sera: \" + novaMatricula + \" Deseja prosseguir com essa nova matricula? S/N ");
+        }
+        if(confirm.equals("S")){
+            listaAlunos.get(opcao).setNome(novaMatricula);
+        }
+        else{
+            System.out.println("Cancelado, voltando ao menu inicial...");
+            menuAlunos();
+        }
+        System.out.println(listaAlunos);
     }
 
 }
