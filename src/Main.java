@@ -5,10 +5,59 @@ import java.util.regex.Pattern;
 
 public class Main {
     private static ArrayList<Alunos> listaAlunos = new ArrayList<>();
+    private static ArrayList<Turma> listaTurmas = new ArrayList<>();
 
     public static void main(String[] args) {
         menuAlunos();
 
+    }
+    public static void menuInicial(){
+        String menuText = """
+                Escolha o menu desejado
+                1- Turmas
+                2- Alunos
+                3- Sair""";
+        System.out.println(menuText);
+        String opcao = Ler.dados("Selecione sua opção: ");
+        switch (opcao) {
+            case "1":
+
+                break;
+            case "2":
+                menuAlunos();
+                break;
+            case "3":
+
+                break;
+        }
+    }
+    public static void menuTurmas() {
+        String menuText = """
+                Menu insano do caba
+                1- listar turmas
+                2- criar turma
+                3- excluir turmas
+                4- atualizar turma
+                """;
+        System.out.println(menuText);
+        String opcao = Ler.dados("Selecione sua opção: ");
+        switch (opcao) {
+            case "1":
+
+                break;
+            case "2":
+
+                break;
+            case "3":
+
+                break;
+            case "4":
+
+                break;
+            default:
+                System.out.println("Opção Inválida, tente novamente!");
+
+        }
     }
 
     public static void menuAlunos() {
@@ -39,6 +88,40 @@ public class Main {
                 menuAlunos();
         }
     }
+
+    private static void criarTurma() {
+
+        String nome = Ler.dados("Nome do aluno: ").replaceAll("\\\\s", "");
+
+        while (!isLetra(nome)) {
+            System.out.print("o nome deve ser digitado com letras e sem espacos");
+            nome = Ler.dados("Nome da turma: ");
+        }
+        String sigla = Ler.dados("Sigla da turma: ").replaceAll("\\\\s", "");
+
+
+        String menuText = """
+                Periodos disponiveis
+                1- Matutino
+                2- Vespertino
+                3- Noturno
+                """;
+
+        String opcaoText = Ler.dados("Escolha o Periodo da turma (1,2,3): ");
+        while (!isNumero(opcaoText)) {
+            System.out.print("Escolha o periodo desejado pelo número: ");
+            opcaoText = Ler.dados("Escolha o Periodo da turma (1,2,3)s: ");
+        }
+        int opcao = Integer.parseInt(opcaoText);
+        try {
+            var periodo = Periodo.numPeriodo(opcao);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+
+    }
+
 
     private static void criarAluno() {
         int idadeNum = 0;
