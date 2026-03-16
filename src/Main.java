@@ -113,8 +113,9 @@ public class Main {
             opcaoText = Ler.dados("Escolha o Periodo da turma (1,2,3)s: ");
         }
         int opcao = Integer.parseInt(opcaoText);
+        Periodo periodo;
         try {
-            var periodo = Periodo.numPeriodo(opcao);
+            periodo = Periodo.numPeriodo(opcao);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

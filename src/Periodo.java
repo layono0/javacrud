@@ -6,7 +6,7 @@ public enum Periodo {
     private static final Periodo[] periodos = Periodo.values();
 
 
-    public static Periodo numPeriodo(int index) throws Exception {
+    public static Periodo numPeriodo(int index) {
         if (index >= 0 && index < periodos.length) {
             return periodos[index];
         } else {
