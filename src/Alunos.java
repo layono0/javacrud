@@ -1,8 +1,9 @@
+import java.time.LocalDate;
 import java.time.Period;
 
 public class Alunos {
     private String nome;
-    private int idade;
+    private LocalDate dataNascimento;
     private String matricula;
     private Turma turma;
 
@@ -22,12 +23,16 @@ public class Alunos {
         this.nome = nome;
     }
 
-    public int getIdade() {
-        return idade;
+    public LocalDate getDataNascimento() {
+        return dataNascimento;
     }
 
-    public void setIdade(int idade) {
-        this.idade = idade;
+    public void setDataNascimento(LocalDate dataNascimento) {
+        this.dataNascimento = dataNascimento;
+    }
+
+    public int getIdade() {
+        return Period.between(dataNascimento, LocalDate.now()).getYears();
     }
 
     public String getMatricula() {
@@ -38,16 +43,16 @@ public class Alunos {
         this.matricula = matricula;
     }
 
-    public Alunos(String nome, int idade, String matricula) {
+    public Alunos(String nome, LocalDate dataNascimento, String matricula, Turma turma) {
         this.nome = nome;
-        this.idade = idade;
+        this.dataNascimento = dataNascimento;
         this.matricula = matricula;
         this.turma = turma;
     }
 
     @Override
     public String toString(){
-        return "aluno: " + nome + '\n'+ "idade: " + idade + '\n' + "matricula: " + matricula + '\n' + "turma: " + turma;
+        return "aluno: " + nome + '\n'+ "data nascimento: " + dataNascimento + '\n' + "idade: " + getIdade() + " anos" + '\n' + "matricula: " + matricula + '\n' + "turma: " + turma;
 
     }
 

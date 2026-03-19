@@ -2,6 +2,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.regex.Pattern;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
 public class Main {
     private static ArrayList<Alunos> listaAlunos = new ArrayList<>();
@@ -146,29 +149,137 @@ public class Main {
 
 
     private static void criarAluno() {
-        int idadeNum = 0;
-        String nome = Ler.dados("Nome do aluno: ").replaceAll("\\\\s", "");
-
-
-        while (!isLetra(nome)) {
-            System.out.print("o nome deve ser digitado com letras e sem espacos");
+        String nome = Ler.dados("Nome do aluno: ");
+        
+        while (!isNomeValido(nome)) {
+            System.out.println("Nome inválido! O nome não pode conter números, caracteres especiais, estar em branco ou ser nulo.");
             nome = Ler.dados("Nome do aluno: ");
         }
-        String idade = Ler.dados("Idade do aluno");
-        while (!isNumero(idade)) {
-            System.out.print("a idade deve ser um número: ");
-            idade = Ler.dados("Idade do aluno: ");
-
-
+        
+        LocalDate dataNascimento = null;
+        boolean dataValida = false;
+        while (!dataValida) {
+            String dataStr = Ler.dados("Data de nascimento (DD/MM/YYYY): ");
+            dataNascimento = parseData(dataStr);
+            
+            if (dataNascimento == null) {
+                System.out.println("Data inválida! Digite no formato DD/MM/YYYY.");
+                continue;
+            }
+            
+            int idade = calcularIdade(dataNascimento);
+            
+            if (idade < 14) {
+                System.out.println("O aluno deve ter pelo menos 14 anos. Cadastro não permitido.");
+                return;
+            }
+            
+            if (idade > 130) {
+                System.out.println("A idade máxima permitida é 130 anos. Cadastro não permitido.");
+                return;
+            }
+            
+            dataValida = true;
         }
-        idadeNum = Integer.parseInt(idade);
-        String matricula = Ler.dados("Matricula do aluno: ").replaceAll("\\\\s", "");
+        
+        String matricula = Ler.dados("Matrícula do aluno: ");
+        while (matricula == null || matricula.isBlank()) {
+            System.out.println("Matrícula não pode estar em branco!");
+            matricula = Ler.dados("Matrícula do aluno: ");
+        }
+        
+        if (listaTurmas.isEmpty()) {
+            System.out.println("Nenhuma turma cadastrada! Crie uma turma antes de adicionar alunos.");
+            return;
+        }
+        
+        Turma turmaSelected = selecionarTurma();
+        if (turmaSelected == null) {
+            System.out.println("Turma inválida ou inativa. Cadastro cancelado.");
+            return;
+        }
+        
+        String confirmText = Ler.dados("Deseja confirmar a criação do aluno? S/N: ").toUpperCase();
+        while (!opcaoisValida(confirmText)) {
+            System.out.println("Opção inválida! Digite S ou N");
+            confirmText = Ler.dados("Deseja confirmar a criação do aluno? S/N: ").toUpperCase();
+        }
+        
+        if (confirmText.equals("S")) {
+            Alunos alunoNovo = new Alunos(nome, dataNascimento, matricula, turmaSelected);
+            listaAlunos.add(alunoNovo);
+            System.out.println("Aluno criado com sucesso!");
+            System.out.println(alunoNovo);
+        } else {
+            System.out.println("Criação cancelada.");
+        }
+    }
 
-        Alunos alunoNovo = new Alunos(nome, idadeNum, matricula);
-        listaAlunos.add(alunoNovo);
-        System.out.println(listaAlunos);
-        menuAlunos();
+    private static Turma selecionarTurma() {
+        int contagem = 0;
+        System.out.println("\n=== TURMAS ATIVAS DISPONÍVEIS ===");
+        ArrayList<Turma> turmasAtivas = new ArrayList<>();
+        
+        for (Turma turma : listaTurmas) {
+            if (turma.isAtivo()) {
+                turmasAtivas.add(turma);
+                contagem++;
+                System.out.println(contagem + " - " + turma.getCurso() + " (" + turma.getSigla() + ") - Período: " + turma.getPeriodo());
+            }
+        }
+        
+        if (turmasAtivas.isEmpty()) {
+            System.out.println("Nenhuma turma ativa disponível!");
+            return null;
+        }
+        
+        String opcaoStr = Ler.dados("Selecione a turma do aluno: ");
+        while (!isNumero(opcaoStr)) {
+            System.out.print("A opção desejada DEVE ser um número.");
+            opcaoStr = Ler.dados("Número referente à turma: ");
+        }
+        
+        int opcao = Integer.parseInt(opcaoStr) - 1;
+        
+        if (opcao < 0 || opcao >= turmasAtivas.size()) {
+            System.out.println("Opção inválida!");
+            return null;
+        }
+        
+        return turmasAtivas.get(opcao);
+    }
 
+    private static boolean isNomeValido(String nome) {
+        if (nome == null || nome.isBlank()) {
+            return false;
+        }
+        
+        if (nome.matches(".*\\d.*")) {
+            return false;
+        }
+        
+        if (!nome.matches("[a-zA-Zà-üÀ-Ü\\s]+")) {
+            return false;
+        }
+        
+        return true;
+    }
+
+    private static LocalDate parseData(String dataStr) {
+        if (dataStr == null || dataStr.isBlank()) {
+            return null;
+        }
+        
+        try {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            return LocalDate.parse(dataStr, formatter);
+        } catch (DateTimeParseException e) {
+            return null;
+        }
+    }
+
+    private static int calcularIdade(LocalDate dataNascimento) {
+        return java.time.Period.between(dataNascimento, LocalDate.now()).getYears();
     }
 
     private static boolean isNumero(String numero) {
@@ -243,30 +354,37 @@ public class Main {
     }
 
     private static void atualizarAlunos(){
-
+        if (listaAlunos.isEmpty()) {
+            System.out.println("Nenhum aluno cadastrado!");
+            return;
+        }
 
         int contagem = 0;
-
         System.out.println("Alunos cadastrados no momento");
         for (Alunos aluno : listaAlunos) {
             contagem++;
             System.out.println(contagem + " - " + aluno.getNome());
-
         }
 
         String opcaoStr = Ler.dados("Digite o numero referente ao aluno que deseja Editar: ");
         while (!isNumero(opcaoStr)) {
             System.out.print("A opcao desejada DEVE ser um numero." + '\n');
             opcaoStr = Ler.dados("Numero referente ao aluno: ");
-
         }
-        int opcao = diminuiUm(Integer.parseInt(opcaoStr));
+        
+        int opcao = Integer.parseInt(opcaoStr) - 1;
+        
+        if (opcao < 0 || opcao >= listaAlunos.size()) {
+            System.out.println("Opção inválida!");
+            return;
+        }
 
         String menutxt = """
                 (Escolha o atributo para modificar)
                 1- Nome
-                2- Idade
-                3- Matricula
+                2- Data de Nascimento
+                3- Matrícula
+                4- Turma
                 
                 """;
         System.out.println(menutxt);
@@ -274,95 +392,134 @@ public class Main {
 
         String opcaoUpdate = Ler.dados("Escolha qual Propriedade deseja editar: ");
 
-            switch (opcaoUpdate){
-                case "1":
-                    atualizarNome(opcao);
-                    break;
-                case "2":
-                    atualizarIdade(opcao);
-                    break;
-                case "3":
-                    atualizarMatricula(opcao);
-                    break;
-                default:
-                    System.out.println("Opcao invalida! escolha apenas entre os números da lista");
-
-            }
-
-
-
+        switch (opcaoUpdate){
+            case "1":
+                atualizarNome(opcao);
+                break;
+            case "2":
+                atualizarDataNascimento(opcao);
+                break;
+            case "3":
+                atualizarMatricula(opcao);
+                break;
+            case "4":
+                atualizarTurmaAluno(opcao);
+                break;
+            default:
+                System.out.println("Opcao invalida! escolha apenas entre os números da lista");
+        }
     }
 
-    private  static  void atualizarNome(int opcao){
+    private static void atualizarNome(int opcao){
         String novoNome = Ler.dados("Escolha o novo nome do Aluno: ");
 
-        while(!isLetra(novoNome)){
-            System.out.println("Esse nome e invalido, use apenas letras e sem espacos.");
+        while(!isNomeValido(novoNome)){
+            System.out.println("Esse nome é inválido. Não pode conter números, caracteres especiais ou estar em branco.");
             novoNome = Ler.dados("Escolha o novo nome do Aluno: ");
         }
 
-        String confirm = Ler.dados("O novo nome sera: " + novoNome + " Deseja prosseguir com esse novo nome? S/N").toUpperCase();
+        String confirm = Ler.dados("O novo nome será: " + novoNome + " Deseja prosseguir? S/N: ").toUpperCase();
         while(!opcaoisValida(confirm)){
-            System.out.println("Opcao invalida! a escolha deve ser S ou N");
-            confirm = Ler.dados("O novo nome sera: \" + novoNome + \" Deseja prosseguir com esse novo nome? S/N ");
+            System.out.println("Opção inválida! A escolha deve ser S ou N");
+            confirm = Ler.dados("Deseja prosseguir? S/N: ").toUpperCase();
         }
         if(confirm.equals("S")){
             listaAlunos.get(opcao).setNome(novoNome);
+            System.out.println("Nome atualizado com sucesso!");
         }
         else{
-            System.out.println("Cancelado, voltando ao menu inicial...");
-            menuAlunos();
+            System.out.println("Cancelado...");
         }
-        System.out.println(listaAlunos);
-
-
+        System.out.println(listaAlunos.get(opcao));
     }
 
-
-    private  static  void atualizarIdade(int opcao){
-        String novaIdadeStr = Ler.dados("Escolha a nova idade do Aluno: ");
-        while (!isNumero(novaIdadeStr)) {
-            System.out.print("A opcao desejada DEVE ser um numero." + '\n');
-            novaIdadeStr = Ler.dados("Numero referente ao aluno: ");
-
+    private static void atualizarDataNascimento(int opcao){
+        LocalDate novaData = null;
+        boolean dataValida = false;
+        
+        while (!dataValida) {
+            String dataStr = Ler.dados("Digite a nova data de nascimento (DD/MM/YYYY): ");
+            novaData = parseData(dataStr);
+            
+            if (novaData == null) {
+                System.out.println("Data inválida! Digite no formato DD/MM/YYYY.");
+                continue;
+            }
+            
+            int idade = calcularIdade(novaData);
+            
+            if (idade < 14) {
+                System.out.println("O aluno deve ter pelo menos 14 anos. Operação cancelada.");
+                return;
+            }
+            
+            if (idade > 130) {
+                System.out.println("A idade máxima permitida é 130 anos. Operação cancelada.");
+                return;
+            }
+            
+            dataValida = true;
         }
-        int idade = Integer.parseInt(novaIdadeStr);
-        String confirm = Ler.dados("A nova idade sera: " + idade + " Deseja prosseguir com essa nova idade? S/N").toUpperCase();
+
+        String confirm = Ler.dados("A nova data será: " + novaData + " (idade: " + calcularIdade(novaData) + " anos). Deseja prosseguir? S/N: ").toUpperCase();
         while(!opcaoisValida(confirm)){
-            System.out.println("Opcao invalida! a escolha deve ser S ou N");
-            confirm = Ler.dados("A nova idade sera: \" + idade + \" Deseja prosseguir com essa nova idade? S/N ");
+            System.out.println("Opção inválida! A escolha deve ser S ou N");
+            confirm = Ler.dados("Deseja prosseguir? S/N: ").toUpperCase();
         }
         if(confirm.equals("S")){
-            listaAlunos.get(opcao).setIdade(idade);
+            listaAlunos.get(opcao).setDataNascimento(novaData);
+            System.out.println("Data de nascimento atualizada com sucesso!");
         }
         else{
-            System.out.println("Cancelado, voltando ao menu inicial...");
-            menuAlunos();
+            System.out.println("Cancelado...");
         }
-        System.out.println(listaAlunos);
+        System.out.println(listaAlunos.get(opcao));
     }
 
 
-    private  static  void atualizarMatricula(int opcao){
-        String novaMatricula = Ler.dados("Escolha a nova matricula do Aluno: ");
-        while(!isLetra(novaMatricula)){
-            System.out.println("essa matricula e invalida, use apenas letras e sem espacos.");
-            novaMatricula = Ler.dados("Escolha a nova matricula do Aluno: ");
+    private static void atualizarMatricula(int opcao){
+        String novaMatricula = Ler.dados("Escolha a nova matrícula do Aluno: ");
+        while(novaMatricula == null || novaMatricula.isBlank()){
+            System.out.println("A matrícula não pode estar em branco!");
+            novaMatricula = Ler.dados("Escolha a nova matrícula do Aluno: ");
         }
 
-        String confirm = Ler.dados("A nova matricula sera: " + novaMatricula + " Deseja prosseguir com essa nova matricula? S/N").toUpperCase();
+        String confirm = Ler.dados("A nova matrícula será: " + novaMatricula + " Deseja prosseguir? S/N: ").toUpperCase();
         while(!opcaoisValida(confirm)){
-            System.out.println("Opcao invalida! a escolha deve ser S ou N");
-            confirm = Ler.dados("A nova matricula sera: \" + novaMatricula + \" Deseja prosseguir com essa nova matricula? S/N ");
+            System.out.println("Opção inválida! A escolha deve ser S ou N");
+            confirm = Ler.dados("Deseja prosseguir? S/N: ").toUpperCase();
         }
         if(confirm.equals("S")){
             listaAlunos.get(opcao).setMatricula(novaMatricula);
+            System.out.println("Matrícula atualizada com sucesso!");
         }
         else{
-            System.out.println("Cancelado, voltando ao menu inicial...");
-            menuAlunos();
+            System.out.println("Cancelado...");
         }
-        System.out.println(listaAlunos);
+        System.out.println(listaAlunos.get(opcao));
+    }
+
+    private static void atualizarTurmaAluno(int opcao){
+        Turma novaTurma = selecionarTurma();
+        
+        if (novaTurma == null) {
+            System.out.println("Turma inválida ou inativa. Operação cancelada.");
+            return;
+        }
+
+        String confirm = Ler.dados("A nova turma será: " + novaTurma.getCurso() + ". Deseja prosseguir? S/N: ").toUpperCase();
+        while(!opcaoisValida(confirm)){
+            System.out.println("Opção inválida! A escolha deve ser S ou N");
+            confirm = Ler.dados("Deseja prosseguir? S/N: ").toUpperCase();
+        }
+        if(confirm.equals("S")){
+            listaAlunos.get(opcao).setTurma(novaTurma);
+            System.out.println("Turma atualizada com sucesso!");
+        }
+        else{
+            System.out.println("Cancelado...");
+        }
+        System.out.println(listaAlunos.get(opcao));
     }
 
     private static void listarTurmas() {
