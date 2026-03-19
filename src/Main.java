@@ -8,55 +8,67 @@ public class Main {
     private static ArrayList<Turma> listaTurmas = new ArrayList<>();
 
     public static void main(String[] args) {
-        menuAlunos();
-
+        menuInicial();
     }
+
     public static void menuInicial(){
-        String menuText = """
-                Escolha o menu desejado
-                1- Turmas
-                2- Alunos
-                3- Sair""";
-        System.out.println(menuText);
-        String opcao = Ler.dados("Selecione sua opção: ");
-        switch (opcao) {
-            case "1":
-
-                break;
-            case "2":
-                menuAlunos();
-                break;
-            case "3":
-
-                break;
+        boolean continuar = true;
+        while (continuar) {
+            String menuText = """
+                    Escolha o menu desejado
+                    1- Turmas
+                    2- Alunos
+                    3- Sair""";
+            System.out.println(menuText);
+            String opcao = Ler.dados("Selecione sua opção: ");
+            switch (opcao) {
+                case "1":
+                    menuTurmas();
+                    break;
+                case "2":
+                    menuAlunos();
+                    break;
+                case "3":
+                    System.out.println("Saindo do programa...");
+                    continuar = false;
+                    break;
+                default:
+                    System.out.println("Opção Inválida, tente novamente!");
+            }
         }
     }
     public static void menuTurmas() {
-        String menuText = """
-                Menu insano do caba
-                1- listar turmas
-                2- criar turma
-                3- excluir turmas
-                4- atualizar turma
-                """;
-        System.out.println(menuText);
-        String opcao = Ler.dados("Selecione sua opção: ");
-        switch (opcao) {
-            case "1":
-
-                break;
-            case "2":
-
-                break;
-            case "3":
-
-                break;
-            case "4":
-
-                break;
-            default:
-                System.out.println("Opção Inválida, tente novamente!");
-
+        boolean continuar = true;
+        while (continuar) {
+            String menuText = """
+                    Menu de Turmas
+                    1- listar turmas
+                    2- criar turma
+                    3- excluir turmas
+                    4- atualizar turma
+                    5- Voltar ao menu anterior
+                    """;
+            System.out.println(menuText);
+            String opcao = Ler.dados("Selecione sua opção: ");
+            switch (opcao) {
+                case "1":
+                    listarTurmas();
+                    break;
+                case "2":
+                    criarTurma();
+                    break;
+                case "3":
+                    excluirTurma();
+                    break;
+                case "4":
+                    atualizarTurma();
+                    break;
+                case "5":
+                    continuar = false;
+                    break;
+                default:
+                    System.out.println("Opção Inválida, tente novamente!");
+            }
         }
     }
 
@@ -90,37 +102,46 @@ public class Main {
     }
 
     private static void criarTurma() {
-
-        String nome = Ler.dados("Nome do aluno: ").replaceAll("\\\\s", "");
+        String nome = Ler.dados("Nome da turma: ").replaceAll("\\s", "");
 
         while (!isLetra(nome)) {
-            System.out.print("o nome deve ser digitado com letras e sem espacos");
-            nome = Ler.dados("Nome da turma: ");
+            System.out.println("O nome deve ser digitado com letras e sem espaços");
+            nome = Ler.dados("Nome da turma: ").replaceAll("\\s", "");
         }
-        String sigla = Ler.dados("Sigla da turma: ").replaceAll("\\\\s", "");
-
+        
+        String sigla = Ler.dados("Sigla da turma: ").replaceAll("\\s", "");
 
         String menuText = """
-                Periodos disponiveis
+                Períodos disponíveis
                 1- Matutino
                 2- Vespertino
                 3- Noturno
                 """;
+        System.out.println(menuText);
 
-        String opcaoText = Ler.dados("Escolha o Periodo da turma (1,2,3): ");
-        while (!isNumero(opcaoText)) {
-            System.out.print("Escolha o periodo desejado pelo número: ");
-            opcaoText = Ler.dados("Escolha o Periodo da turma (1,2,3)s: ");
+        String opcaoText = Ler.dados("Escolha o Período da turma (1, 2 ou 3): ");
+        while (!isNumero(opcaoText) || Integer.parseInt(opcaoText) < 1 || Integer.parseInt(opcaoText) > 3) {
+            System.out.println("Escolha o período desejado pelo número (1, 2 ou 3): ");
+            opcaoText = Ler.dados("Escolha o Período da turma: ");
         }
-        int opcao = Integer.parseInt(opcaoText);
-        Periodo periodo;
-        try {
-            periodo = Periodo.numPeriodo(opcao);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        
+        int opcao = Integer.parseInt(opcaoText) - 1;
+        Periodo periodo = Periodo.numPeriodo(opcao);
+
+        String confirmText = Ler.dados("Deseja confirmar a criação da turma? S/N: ").toUpperCase();
+        while (!opcaoisValida(confirmText)) {
+            System.out.println("Opção inválida! Digite S ou N");
+            confirmText = Ler.dados("Deseja confirmar a criação da turma? S/N: ").toUpperCase();
         }
 
-
+        if (confirmText.equals("S")) {
+            Turma novaTurma = new Turma(nome, sigla, periodo, true);
+            listaTurmas.add(novaTurma);
+            System.out.println("Turma criada com sucesso!");
+            System.out.println(listaTurmas);
+        } else {
+            System.out.println("Criação cancelada.");
+        }
     }
 
 
@@ -335,13 +356,219 @@ public class Main {
             confirm = Ler.dados("A nova matricula sera: \" + novaMatricula + \" Deseja prosseguir com essa nova matricula? S/N ");
         }
         if(confirm.equals("S")){
-            listaAlunos.get(opcao).setNome(novaMatricula);
+            listaAlunos.get(opcao).setMatricula(novaMatricula);
         }
         else{
             System.out.println("Cancelado, voltando ao menu inicial...");
             menuAlunos();
         }
         System.out.println(listaAlunos);
+    }
+
+    private static void listarTurmas() {
+        if (listaTurmas.isEmpty()) {
+            System.out.println("Nenhuma turma cadastrada!");
+        } else {
+            System.out.println("\n=== TURMAS CADASTRADAS ===");
+            for (int i = 0; i < listaTurmas.size(); i++) {
+                System.out.println((i + 1) + " - " + listaTurmas.get(i));
+            }
+        }
+    }
+
+    private static void excluirTurma() {
+        if (listaTurmas.isEmpty()) {
+            System.out.println("Nenhuma turma cadastrada!");
+            return;
+        }
+        
+        int contagem = 0;
+        System.out.println("Turmas cadastradas no momento");
+        for (Turma turma : listaTurmas) {
+            contagem++;
+            System.out.println(contagem + " - " + turma.getCurso() + " (" + turma.getSigla() + ")");
+        }
+
+        String opcaoStr = Ler.dados("Digite o numero referente à turma que deseja excluir: ");
+        while (!isNumero(opcaoStr)) {
+            System.out.print("A opção desejada DEVE ser um número.");
+            opcaoStr = Ler.dados("Número referente à turma: ");
+        }
+
+        int opcao = diminuiUm(Integer.parseInt(opcaoStr));
+        
+        if (opcao < 0 || opcao >= listaTurmas.size()) {
+            System.out.println("Opção inválida!");
+            return;
+        }
+
+        String confirm = Ler.dados("Você deseja MESMO excluir a turma " + listaTurmas.get(opcao).getCurso() + "? Confirme com S/N: ").toUpperCase();
+        while (!opcaoisValida(confirm)) {
+            System.out.println("Opção inválida! A escolha deve ser S ou N");
+            confirm = Ler.dados("Você deseja MESMO excluir a turma? Confirme com S/N: ").toUpperCase();
+        }
+
+        if (confirm.equals("S")) {
+            listaTurmas.remove(opcao);
+            System.out.println("Turma removida com sucesso!");
+        } else {
+            System.out.println("A turma não foi removida...");
+        }
+    }
+
+    private static void atualizarTurma() {
+        if (listaTurmas.isEmpty()) {
+            System.out.println("Nenhuma turma cadastrada!");
+            return;
+        }
+
+        int contagem = 0;
+        System.out.println("Turmas cadastradas no momento");
+        for (Turma turma : listaTurmas) {
+            contagem++;
+            System.out.println(contagem + " - " + turma.getCurso() + " (" + turma.getSigla() + ")");
+        }
+
+        String opcaoStr = Ler.dados("Digite o número referente à turma que deseja editar: ");
+        while (!isNumero(opcaoStr)) {
+            System.out.print("A opção desejada DEVE ser um número.\n");
+            opcaoStr = Ler.dados("Número referente à turma: ");
+        }
+
+        int opcao = diminuiUm(Integer.parseInt(opcaoStr));
+        
+        if (opcao < 0 || opcao >= listaTurmas.size()) {
+            System.out.println("Opção inválida!");
+            return;
+        }
+
+        String menuTxt = """
+                (Escolha o atributo para modificar)
+                1- Nome da Turma
+                2- Sigla
+                3- Período
+                4- Status (Ativo/Inativo)
+                """;
+        System.out.println(menuTxt);
+        System.out.println("Turma selecionada: " + listaTurmas.get(opcao));
+
+        String opcaoUpdate = Ler.dados("Escolha qual propriedade deseja editar: ");
+
+        switch (opcaoUpdate) {
+            case "1":
+                atualizarNomeTurma(opcao);
+                break;
+            case "2":
+                atualizarSiglaTurma(opcao);
+                break;
+            case "3":
+                atualizarPeriodoTurma(opcao);
+                break;
+            case "4":
+                atualizarStatusTurma(opcao);
+                break;
+            default:
+                System.out.println("Opção inválida! Escolha apenas entre os números da lista");
+        }
+    }
+
+    private static void atualizarNomeTurma(int opcao) {
+        String novoNome = Ler.dados("Escolha o novo nome da turma: ").replaceAll("\\s", "");
+
+        while (!isLetra(novoNome)) {
+            System.out.println("Esse nome é inválido. Use apenas letras e sem espaços.");
+            novoNome = Ler.dados("Escolha o novo nome da turma: ").replaceAll("\\s", "");
+        }
+
+        String confirm = Ler.dados("O novo nome será: " + novoNome + ". Deseja prosseguir? S/N: ").toUpperCase();
+        while (!opcaoisValida(confirm)) {
+            System.out.println("Opção inválida! A escolha deve ser S ou N");
+            confirm = Ler.dados("Deseja prosseguir? S/N: ").toUpperCase();
+        }
+
+        if (confirm.equals("S")) {
+            listaTurmas.get(opcao).setCurso(novoNome);
+            System.out.println("Nome atualizado com sucesso!");
+        } else {
+            System.out.println("Cancelado...");
+        }
+        System.out.println(listaTurmas.get(opcao));
+    }
+
+    private static void atualizarSiglaTurma(int opcao) {
+        String novaSigla = Ler.dados("Escolha a nova sigla da turma: ").replaceAll("\\s", "");
+
+        while (!isLetra(novaSigla)) {
+            System.out.println("Essa sigla é inválida. Use apenas letras e sem espaços.");
+            novaSigla = Ler.dados("Escolha a nova sigla da turma: ").replaceAll("\\s", "");
+        }
+
+        String confirm = Ler.dados("A nova sigla será: " + novaSigla + ". Deseja prosseguir? S/N: ").toUpperCase();
+        while (!opcaoisValida(confirm)) {
+            System.out.println("Opção inválida! A escolha deve ser S ou N");
+            confirm = Ler.dados("Deseja prosseguir? S/N: ").toUpperCase();
+        }
+
+        if (confirm.equals("S")) {
+            listaTurmas.get(opcao).setSigla(novaSigla);
+            System.out.println("Sigla atualizada com sucesso!");
+        } else {
+            System.out.println("Cancelado...");
+        }
+        System.out.println(listaTurmas.get(opcao));
+    }
+
+    private static void atualizarPeriodoTurma(int opcao) {
+        String menuText = """
+                Períodos disponíveis
+                1- Matutino
+                2- Vespertino
+                3- Noturno
+                """;
+        System.out.println(menuText);
+
+        String opcaoText = Ler.dados("Escolha o novo período (1, 2 ou 3): ");
+        while (!isNumero(opcaoText) || Integer.parseInt(opcaoText) < 1 || Integer.parseInt(opcaoText) > 3) {
+            System.out.println("Opção inválida! Escolha entre 1, 2 ou 3");
+            opcaoText = Ler.dados("Escolha o novo período: ");
+        }
+
+        int novoPeriodo = Integer.parseInt(opcaoText) - 1;
+        Periodo periodo = Periodo.numPeriodo(novoPeriodo);
+
+        String confirm = Ler.dados("O novo período será: " + periodo + ". Deseja prosseguir? S/N: ").toUpperCase();
+        while (!opcaoisValida(confirm)) {
+            System.out.println("Opção inválida! A escolha deve ser S ou N");
+            confirm = Ler.dados("Deseja prosseguir? S/N: ").toUpperCase();
+        }
+
+        if (confirm.equals("S")) {
+            listaTurmas.get(opcao).setPeriodo(periodo);
+            System.out.println("Período atualizado com sucesso!");
+        } else {
+            System.out.println("Cancelado...");
+        }
+        System.out.println(listaTurmas.get(opcao));
+    }
+
+    private static void atualizarStatusTurma(int opcao) {
+        Turma turmaAtual = listaTurmas.get(opcao);
+        boolean novoStatus = !turmaAtual.isAtivo();
+        String statusText = novoStatus ? "ATIVA" : "INATIVA";
+
+        String confirm = Ler.dados("A turma será marcada como " + statusText + ". Deseja prosseguir? S/N: ").toUpperCase();
+        while (!opcaoisValida(confirm)) {
+            System.out.println("Opção inválida! A escolha deve ser S ou N");
+            confirm = Ler.dados("Deseja prosseguir? S/N: ").toUpperCase();
+        }
+
+        if (confirm.equals("S")) {
+            turmaAtual.setAtivo(novoStatus);
+            System.out.println("Status atualizado para: " + statusText);
+        } else {
+            System.out.println("Cancelado...");
+        }
+        System.out.println(listaTurmas.get(opcao));
     }
 
 }
